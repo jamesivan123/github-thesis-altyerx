@@ -1,0 +1,55 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+file_path = 'E:/tracks1.csv'  
+df = pd.read_csv('E:/tracks1.csv')
+
+df['release_date'] = pd.to_datetime(df['release_date'], errors='coerce')
+
+df['year'] = df['release_date'].dt.year
+
+df = df[df['year'] >= 1960]
+
+df_filtered = df.drop(columns=['duration_ms', 'explicit', 'mode', 'key', 'time_signature', 'year'])
+
+basic_stats_filtered = df_filtered.describe()
+
+print("Basic Statistics of the Filtered Dataset:")
+print(basic_stats_filtered)
+
+plt.figure(figsize=(10, 6))
+sns.histplot(df['release_date'].dt.year, bins=60, kde=True)
+plt.title('Distribution of Tracks Over the Years (1960s onwards)')
+plt.xlabel('Year')
+plt.ylabel('Number of Tracks')
+plt.grid(True)
+plt.show()
+
+correlation_matrix_filtered = df_filtered.corr(numeric_only=True)
+
+print("\nCorrelation Matrix of Numerical Features (Filtered):")
+print(correlation_matrix_filtered)
+
+plt.figure(figsize=(12, 8))
+sns.heatmap(correlation_matrix_filtered, annot=True, cmap='coolwarm', fmt=".2f", linewidths=0.5)
+plt.title('Correlation Matrix of Numerical Features (Filtered)')
+plt.show()
+
+plt.figure(figsize=(10, 6))
+sns.histplot(df_filtered['popularity'], bins=30, kde=True)
+plt.title('Distribution of Track Popularity')
+plt.xlabel('Popularity')
+plt.ylabel('Frequency')
+plt.grid(True)
+plt.show()
+
+df_filtered['decade'] = (df['release_date'].dt.year // 10) * 10
+
+plt.figure(figsize=(12, 6))
+sns.boxplot(x='decade', y='popularity', data=df_filtered)
+plt.title('Distribution of Track Popularity by Decade')
+plt.xlabel('Decade')
+plt.ylabel('Popularity')
+plt.grid(True)
+plt.show()
